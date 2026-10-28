@@ -1,0 +1,7 @@
+dist/
+node_modules/
+course_manuscript/
+resources/
+.vscode/
+*.pdf
+*.md
