@@ -18,7 +18,7 @@ function renderPage(view: ViewName, data: CaseDataState, navigate: (view: ViewNa
     case "people":
       return <PeoplePage data={data} />;
     case "timeline":
-      return <TimelinePage />;
+      return <TimelinePage data={data} />;
     case "workspace":
       return <WorkspacePage />;
   }

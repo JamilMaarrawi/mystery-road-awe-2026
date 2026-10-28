@@ -1,15 +1,13 @@
 import type { Person } from "../../../../core/types";
 import { Card } from "../../../shared/components/Card";
-import { countEvidenceForPerson } from "../../../../core/lookup";
 
 interface PersonCardProps {
   person: Person;
+  evidenceCount: number;
   onEvidenceClick?: (personId: string) => void;
 }
 
-export function PersonCard({ person, onEvidenceClick }: PersonCardProps) {
-  const evidenceCount = countEvidenceForPerson(person);
-
+export function PersonCard({ person, evidenceCount, onEvidenceClick }: PersonCardProps) {
   return (
     <Card className="person-card">
       <div className="person-card-header">

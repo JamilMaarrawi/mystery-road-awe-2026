@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import type { CaseDataState } from "../../dashboard/useCaseData";
 import { PersonCard } from "./PersonCard";
 import { LocationCard } from "./LocationCard";
+import { evidenceMentionsPerson } from "../../../../core/lookup";
 
 interface PeoplePageProps {
   data: CaseDataState;
@@ -57,19 +58,33 @@ export function PeoplePage({ data }: PeoplePageProps) {
       </div>
 
       {activeTab === "people" && (
-        <div id="peoplePanel" className="people-grid">
-          {data.people.map((person: typeof data.people[number]) => (
-            <PersonCard key={person.id} person={person} />
-          ))}
-        </div>
+        data.people.length > 0 ? (
+          <div id="peoplePanel" className="people-grid">
+            {data.people.map((person: typeof data.people[number]) => (
+              <PersonCard
+                key={person.id}
+                person={person}
+                evidenceCount={
+                  data.evidence.filter((item) => evidenceMentionsPerson(item, person)).length
+                }
+              />
+            ))}
+          </div>
+        ) : (
+          <p id="peoplePanel">No people available.</p>
+        )
       )}
 
       {activeTab === "locations" && (
-        <div id="locationsPanel" className="locations-grid">
-          {data.locations.map((location: typeof data.locations[number]) => (
-            <LocationCard key={location.id} location={location} />
-          ))}
-        </div>
+        data.locations.length > 0 ? (
+          <div id="locationsPanel" className="locations-grid">
+            {data.locations.map((location: typeof data.locations[number]) => (
+              <LocationCard key={location.id} location={location} />
+            ))}
+          </div>
+        ) : (
+          <p id="locationsPanel">No locations available.</p>
+        )
       )}
     </section>
   );
