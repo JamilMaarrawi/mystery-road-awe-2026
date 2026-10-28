@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    // Demo 7 converted every js/**/*.js module to .ts - allowJs/checkJs now
+    // only matter for vite.config.js, which stays plain JS on purpose (Vite
+    // config files don't need the app's own strictness).
+    "allowJs": true,
+    "checkJs": false,
+
+    "strict": true,
+    // Stricter than plain `strict`: indexing an array/object with a
+    // computed key (allEvidence[i], HTML_ESCAPES[ch]) now types the result
+    // as `T | undefined` instead of just `T`, so an out-of-range or
+    // missing-key access has to be handled instead of silently assumed.
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["js/**/*", "vite.config.js"]
+}
