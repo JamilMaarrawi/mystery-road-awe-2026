@@ -1,4 +1,5 @@
 import type { Person } from "../../../../core/types";
+import { Link } from "react-router-dom";
 import { Card } from "../../../shared/components/Card";
 
 interface PersonCardProps {
@@ -17,7 +18,9 @@ export function PersonCard({ person, evidenceCount, onEvidenceClick }: PersonCar
           alt={`Portrait of ${person.name}`}
         />
         <div>
-          <h3>{person.name}</h3>
+          <h3>
+            <Link to={`/people/${person.id}`}>{person.name}</Link>
+          </h3>
           <div className="person-role">{person.role}</div>
         </div>
       </div>

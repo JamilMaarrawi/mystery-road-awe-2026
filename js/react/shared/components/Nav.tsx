@@ -1,30 +1,25 @@
-import { VIEWS, type ViewName } from "../../../core/constants";
+import { NavLink } from "react-router-dom";
 
-const NAV_LABELS: Record<ViewName, string> = {
-  dashboard: "Dashboard",
-  evidence: "Evidence",
-  people: "People & Locations",
-  timeline: "Timeline",
-  workspace: "Workspace",
-};
+const NAV_ITEMS = [
+  { path: "/", label: "Dashboard", end: true },
+  { path: "/evidence", label: "Evidence", end: true },
+  { path: "/people", label: "People & Locations", end: false },
+  { path: "/timeline", label: "Timeline", end: true },
+  { path: "/workspace", label: "Workspace", end: true },
+] as const;
 
-interface NavProps {
-  currentView: ViewName;
-  onNavigate: (view: ViewName) => void;
-}
-
-export function Nav({ currentView, onNavigate }: NavProps) {
+export function Nav() {
   return (
     <nav className="main-nav" aria-label="Main navigation">
-      {VIEWS.map((view) => (
-        <button
-          key={view}
-          type="button"
-          className={view === currentView ? "nav-btn active" : "nav-btn"}
-          onClick={() => onNavigate(view)}
+      {NAV_ITEMS.map((item) => (
+        <NavLink
+          key={item.path}
+          to={item.path}
+          end={item.end}
+          className={({ isActive }) => (isActive ? "nav-btn active" : "nav-btn")}
         >
-          {NAV_LABELS[view]}
-        </button>
+          {item.label}
+        </NavLink>
       ))}
     </nav>
   );

@@ -1,44 +1,52 @@
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import type { ViewName } from "../core/constants";
 import { Header } from "./shared/components/Header";
 import { Nav } from "./shared/components/Nav";
-import { useCurrentView } from "./shared/useCurrentView";
-import { useCaseData, type CaseDataState } from "./features/dashboard/useCaseData";
+import { useCaseData } from "./features/dashboard/useCaseData";
 import { DashboardPage } from "./features/dashboard/components/DashboardPage";
 import { EvidencePage } from "./features/evidence/components/EvidencePage";
 import { PeoplePage } from "./features/people-locations/components/PeoplePage";
+import { PersonDetailPage } from "./features/people-locations/components/PersonDetailPage";
 import { TimelinePage } from "./features/timeline/components/TimelinePage";
 import { WorkspacePage } from "./features/workspace/components/WorkspacePage";
 
-function renderPage(view: ViewName, data: CaseDataState, navigate: (view: ViewName) => void) {
-  switch (view) {
-    case "dashboard":
-      return <DashboardPage data={data} onNavigate={navigate} />;
-    case "evidence":
-      return <EvidencePage />;
-    case "people":
-      return <PeoplePage data={data} />;
-    case "timeline":
-      return <TimelinePage data={data} />;
-    case "workspace":
-      return <WorkspacePage />;
-  }
-}
-
 export function App() {
-  const [currentView, navigate] = useCurrentView();
+  const navigate = useNavigate();
   const data = useCaseData();
+  const navigateToView = (view: ViewName): void => {
+    void navigate(VIEW_PATHS[view]);
+  };
 
   return (
     <>
       <header className="app-header">
         <div className="header-inner">
           <Header />
-          <Nav currentView={currentView} onNavigate={navigate} />
+          <Nav />
         </div>
       </header>
 
       <main id="app" className="app-main">
-        {renderPage(currentView, data, navigate)}
+        <Routes>
+          <Route
+            path="/"
+            element={<DashboardPage data={data} onNavigate={navigateToView} />}
+          />
+          <Route
+            path="/dashboard"
+            element={<DashboardPage data={data} onNavigate={navigateToView} />}
+          />
+          <Route path="/evidence" element={<EvidencePage />} />
+          <Route path="/people" element={<PeoplePage data={data} />} />
+          <Route
+            path="/people/:personId"
+            element={<PersonDetailPage data={data} />}
+          />
+          <Route path="/locations" element={<PeoplePage data={data} />} />
+          <Route path="/timeline" element={<TimelinePage data={data} />} />
+          <Route path="/workspace" element={<WorkspacePage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </main>
 
       <footer className="app-footer">
@@ -50,3 +58,11 @@ export function App() {
     </>
   );
 }
+
+const VIEW_PATHS: Record<ViewName, string> = {
+  dashboard: "/",
+  evidence: "/evidence",
+  people: "/people",
+  timeline: "/timeline",
+  workspace: "/workspace",
+};
