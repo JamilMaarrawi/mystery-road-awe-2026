@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import type { ViewName } from "../core/constants";
-import { readBookmarks, writeBookmarks } from "../services/storage";
+import { readBookmarks, writeBookmarks, readNotes, writeNotes } from "../services/storage";
 import { toggleBookmark } from "./features/evidence/bookmarks";
 import { Header } from "./shared/components/Header";
 import { Nav } from "./shared/components/Nav";
@@ -56,6 +56,17 @@ export function App() {
   const [bookmarks, setBookmarks] = useState(readBookmarks);
   const [bookmarkError, setBookmarkError] = useState<string | null>(null);
 
+  /*
+   * Demo 9: Lifted notes to App to prevent stale state in WorkspacePage.
+   * Before: EvidencePage and WorkspacePage each read notes separately with useState(readNotes).
+   * When EvidencePage saved a note, WorkspacePage never saw the update.
+   *
+   * Solution: Lift notes to App (common ancestor) and pass to EvidencePage and WorkspacePage.
+   * Now both views always see the same notes through props.
+   */
+  const [notes, setNotes] = useState(readNotes);
+  const [notesError, setNotesError] = useState<string | null>(null);
+
   function handleBookmarkClick(id: string) {
     const updated = toggleBookmark(bookmarks, id);
     try {
@@ -67,6 +78,21 @@ export function App() {
       setBookmarkError("Could not save the bookmark to local storage.");
     }
   }
+
+  function handleSaveNote(id: string, text: string): boolean {
+    const updated = { ...notes, [id]: text };
+    try {
+      writeNotes(updated);
+      setNotes(updated);
+      setNotesError(null);
+      return true;
+    } catch (error) {
+      console.error("Could not save evidence note", error);
+      setNotesError("Could not save the note to local storage.");
+      return false;
+    }
+  }
+
   const navigateToView = (view: ViewName): void => {
     void navigate(VIEW_PATHS[view]);
   };
@@ -102,6 +128,9 @@ export function App() {
                 bookmarks={bookmarks}
                 onToggleBookmark={handleBookmarkClick}
                 bookmarkError={bookmarkError}
+                notes={notes}
+                onSaveNote={handleSaveNote}
+                storageError={notesError}
               />
             }
           />
@@ -109,7 +138,10 @@ export function App() {
           <Route path="/people/:personId" element={<PersonDetailPage data={data} />} />
           <Route path="/locations" element={<PeoplePage data={data} />} />
           <Route path="/timeline" element={<TimelinePage data={data} />} />
-          <Route path="/workspace" element={<WorkspacePage data={data} bookmarks={bookmarks} />} />
+          <Route
+            path="/workspace"
+            element={<WorkspacePage data={data} bookmarks={bookmarks} notes={notes} />}
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

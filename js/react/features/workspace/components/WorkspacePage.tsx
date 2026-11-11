@@ -1,16 +1,14 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { CaseDataState } from "../../dashboard/useCaseData";
-import { readNotes } from "../../../../services/storage";
 import { HypothesisForm } from "./HypothesisForm";
 
 interface WorkspacePageProps {
   data: CaseDataState;
   bookmarks: readonly string[];
+  notes: Record<string, string>;
 }
 
-export function WorkspacePage({ data, bookmarks }: WorkspacePageProps) {
-  const [notes] = useState(readNotes);
+export function WorkspacePage({ data, bookmarks, notes }: WorkspacePageProps) {
   const bookmarkedItems = data.evidence.filter((item) => bookmarks.includes(item.id));
   const notedItems = data.evidence.filter((item) => notes[item.id]);
 

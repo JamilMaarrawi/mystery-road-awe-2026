@@ -23,6 +23,46 @@ export const DEFAULT_FILTERS: EvidenceFilters = {
   sort: DEFAULT_SORT_ORDER,
 };
 
+/**
+ * Demo 7: useReducer for evidence filters
+ * Instead of separate useState calls for each filter, a single reducer manages all related state.
+ */
+export type EvidenceFilterAction =
+  | { type: "SET_SEARCH"; payload: string }
+  | { type: "SET_TYPE"; payload: string }
+  | { type: "SET_PERSON"; payload: string }
+  | { type: "SET_LOCATION"; payload: string }
+  | { type: "SET_STATUS"; payload: string }
+  | { type: "SET_RELEVANCE"; payload: string }
+  | { type: "SET_SORT"; payload: SortOrder }
+  | { type: "CLEAR_FILTERS" };
+
+export function evidenceFiltersReducer(
+  state: EvidenceFilters,
+  action: EvidenceFilterAction
+): EvidenceFilters {
+  switch (action.type) {
+    case "SET_SEARCH":
+      return { ...state, search: action.payload };
+    case "SET_TYPE":
+      return { ...state, type: action.payload };
+    case "SET_PERSON":
+      return { ...state, personId: action.payload };
+    case "SET_LOCATION":
+      return { ...state, locationId: action.payload };
+    case "SET_STATUS":
+      return { ...state, status: action.payload };
+    case "SET_RELEVANCE":
+      return { ...state, relevance: action.payload };
+    case "SET_SORT":
+      return { ...state, sort: action.payload };
+    case "CLEAR_FILTERS":
+      return DEFAULT_FILTERS;
+    default:
+      return state;
+  }
+}
+
 const comparators: Record<SortOrder, (a: Evidence, b: Evidence) => number> = {
   [SORT_ORDERS.TITLE_ASC]: (a, b) => a.title.localeCompare(b.title),
   [SORT_ORDERS.TITLE_DESC]: (a, b) => b.title.localeCompare(a.title),

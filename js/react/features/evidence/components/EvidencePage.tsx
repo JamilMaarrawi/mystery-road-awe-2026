@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useReducer, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import type { CaseDataState } from "../../dashboard/useCaseData";
-import { readNotes, writeNotes } from "../../../../services/storage";
-import { DEFAULT_FILTERS, selectEvidence } from "../filters";
+import { DEFAULT_FILTERS, selectEvidence, evidenceFiltersReducer } from "../filters";
 import type { EvidenceFilters } from "../filters";
 import { EvidenceCard } from "./EvidenceCard";
 import { EvidenceDetail } from "./EvidenceDetail";
@@ -13,6 +12,9 @@ interface EvidencePageProps {
   bookmarks: readonly string[];
   onToggleBookmark: (id: string) => void;
   bookmarkError: string | null;
+  notes: Record<string, string>;
+  onSaveNote: (id: string, text: string) => boolean;
+  storageError: string | null;
 }
 
 export function EvidencePage({
@@ -20,28 +22,25 @@ export function EvidencePage({
   bookmarks,
   onToggleBookmark,
   bookmarkError,
+  notes,
+  onSaveNote,
+  storageError,
 }: EvidencePageProps) {
   const [searchParams] = useSearchParams();
-  const [filters, setFilters] = useState<EvidenceFilters>(DEFAULT_FILTERS);
-  const [notes, setNotes] = useState(readNotes);
+  const [filters, dispatch] = useReducer(evidenceFiltersReducer, DEFAULT_FILTERS);
   const [selectedId, setSelectedId] = useState<string | null>(() => searchParams.get("item"));
-  const [storageError, setStorageError] = useState<string | null>(null);
 
   const results = selectEvidence(data.evidence, data.people, filters);
   const selectedEvidence = data.evidence.find((item) => item.id === selectedId);
 
-  function saveNote(id: string, text: string): boolean {
-    const updated = { ...notes, [id]: text };
-    try {
-      writeNotes(updated);
-      setNotes(updated);
-      setStorageError(null);
-      return true;
-    } catch (error) {
-      console.error("Could not save evidence note", error);
-      setStorageError("Could not save the note to local storage.");
-      return false;
-    }
+  function handleFilterChange(changes: Partial<EvidenceFilters>): void {
+    if ("search" in changes) dispatch({ type: "SET_SEARCH", payload: changes.search ?? "" });
+    if ("type" in changes) dispatch({ type: "SET_TYPE", payload: changes.type ?? "" });
+    if ("personId" in changes) dispatch({ type: "SET_PERSON", payload: changes.personId ?? "" });
+    if ("locationId" in changes) dispatch({ type: "SET_LOCATION", payload: changes.locationId ?? "" });
+    if ("status" in changes) dispatch({ type: "SET_STATUS", payload: changes.status ?? "" });
+    if ("relevance" in changes) dispatch({ type: "SET_RELEVANCE", payload: changes.relevance ?? "" });
+    if ("sort" in changes) dispatch({ type: "SET_SORT", payload: changes.sort ?? DEFAULT_FILTERS.sort });
   }
 
   return (
@@ -50,8 +49,8 @@ export function EvidencePage({
       <EvidenceToolbar
         data={data}
         filters={filters}
-        onChange={(changes) => setFilters((current) => ({ ...current, ...changes }))}
-        onClear={() => setFilters(DEFAULT_FILTERS)}
+        onChange={handleFilterChange}
+        onClear={() => dispatch({ type: "CLEAR_FILTERS" })}
       />
       {bookmarkError && <p role="alert">{bookmarkError}</p>}
       {storageError && <p role="alert">{storageError}</p>}
@@ -80,7 +79,7 @@ export function EvidencePage({
           people={data.people}
           locations={data.locations}
           note={notes[selectedEvidence.id] ?? ""}
-          onSaveNote={saveNote}
+          onSaveNote={onSaveNote}
           onClose={() => setSelectedId(null)}
         />
       )}
