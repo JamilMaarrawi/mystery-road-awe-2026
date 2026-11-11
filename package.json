@@ -8,6 +8,8 @@
   "author": "leonardo1710",
   "scripts": {
     "dev": "vite",
+    "dev:backend": "cd backend && npm start",
+    "dev:backend:watch": "cd backend && npm run dev",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
