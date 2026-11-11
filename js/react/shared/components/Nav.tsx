@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useMatch } from "react-router-dom";
 
 const NAV_ITEMS = [
   { path: "/", label: "Dashboard", end: true },
@@ -9,6 +9,8 @@ const NAV_ITEMS = [
 ] as const;
 
 export function Nav() {
+  const isLocationsRoute = useMatch("/locations");
+
   return (
     <nav className="main-nav" aria-label="Main navigation">
       {NAV_ITEMS.map((item) => (
@@ -16,7 +18,9 @@ export function Nav() {
           key={item.path}
           to={item.path}
           end={item.end}
-          className={({ isActive }) => (isActive ? "nav-btn active" : "nav-btn")}
+          className={({ isActive }) =>
+            isActive || (item.path === "/people" && isLocationsRoute) ? "nav-btn active" : "nav-btn"
+          }
         >
           {item.label}
         </NavLink>

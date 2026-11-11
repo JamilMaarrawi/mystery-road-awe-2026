@@ -23,7 +23,7 @@ const INTRO_ITEMS: IntroItem[] = [
   {
     view: "timeline",
     title: "3. Timeline",
-    text: "Walk through events in chronological order, filter by person, location, or type, and jump straight to the evidence behind any event.",
+    text: "Walk through events in chronological order and see the evidence associated with each event. Person and type filters can be set in the URL.",
     button: "Go to Timeline",
   },
   {

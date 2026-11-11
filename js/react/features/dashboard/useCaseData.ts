@@ -9,6 +9,8 @@ export interface CaseDataState {
   locations: Location[];
   evidence: Evidence[];
   timeline: TimelineEvent[];
+  evidenceStatus: LoadStatus;
+  timelineStatus: LoadStatus;
   // "core" = case, people and locations. Without them there is nothing to show.
   coreStatus: LoadStatus;
   coreError: string | null;
@@ -20,6 +22,8 @@ const INITIAL_STATE: CaseDataState = {
   locations: [],
   evidence: [],
   timeline: [],
+  evidenceStatus: "loading",
+  timelineStatus: "loading",
   coreStatus: "loading",
   coreError: null,
 };
@@ -58,18 +62,20 @@ export function useCaseData(): CaseDataState {
     async function loadEvidence(): Promise<void> {
       try {
         const evidence = await fetchJson<Evidence[]>("data/evidence.json");
-        if (!cancelled) setData((prev) => ({ ...prev, evidence }));
+        if (!cancelled) setData((prev) => ({ ...prev, evidence, evidenceStatus: "ready" }));
       } catch (err) {
         console.error("Failed to load evidence.json", err);
+        if (!cancelled) setData((prev) => ({ ...prev, evidenceStatus: "error" }));
       }
     }
 
     async function loadTimeline(): Promise<void> {
       try {
         const timeline = await fetchJson<TimelineEvent[]>("data/timeline.json");
-        if (!cancelled) setData((prev) => ({ ...prev, timeline }));
+        if (!cancelled) setData((prev) => ({ ...prev, timeline, timelineStatus: "ready" }));
       } catch (err) {
         console.error("Failed to load timeline.json", err);
+        if (!cancelled) setData((prev) => ({ ...prev, timelineStatus: "error" }));
       }
     }
 

@@ -41,6 +41,32 @@ function readJson<T>(key: string, fallback: T, isValid: (value: unknown) => bool
 const isPlainObject = (value: unknown): boolean =>
   value !== null && typeof value === "object" && !Array.isArray(value);
 
+export function readBookmarks(): EvidenceId[] {
+  return readJson<EvidenceId[]>(
+    STORAGE_KEY_BOOKMARKS,
+    [],
+    (value) => Array.isArray(value) && value.every((id) => typeof id === "string")
+  );
+}
+
+export function writeBookmarks(bookmarks: EvidenceId[]): void {
+  localStorage.setItem(STORAGE_KEY_BOOKMARKS, JSON.stringify(bookmarks));
+}
+
+export function readNotes(): Record<EvidenceId, string> {
+  return readJson<Record<EvidenceId, string>>(
+    STORAGE_KEY_NOTES,
+    {},
+    (value) =>
+      isPlainObject(value) &&
+      Object.values(value as Record<string, unknown>).every((note) => typeof note === "string")
+  );
+}
+
+export function writeNotes(notes: Record<EvidenceId, string>): void {
+  localStorage.setItem(STORAGE_KEY_NOTES, JSON.stringify(notes));
+}
+
 export function saveBookmarksToStorage(): void {
   localStorage.setItem(STORAGE_KEY_BOOKMARKS, JSON.stringify(state.bookmarks));
 }
@@ -64,7 +90,20 @@ export function loadNotesFromStorage(): void {
 
 // Returns null when nothing usable is stored.
 export function readHypothesisDraft(): HypothesisDraft | null {
-  return readJson<HypothesisDraft | null>(STORAGE_KEY_HYPOTHESIS, null, isPlainObject);
+  return readJson<HypothesisDraft | null>(STORAGE_KEY_HYPOTHESIS, null, (value) => {
+    if (!isPlainObject(value)) return false;
+    const draft = value as Record<string, unknown>;
+    return (
+      typeof draft.suspectId === "string" &&
+      typeof draft.nature === "string" &&
+      Array.isArray(draft.evidenceIds) &&
+      draft.evidenceIds.every((id) => typeof id === "string") &&
+      typeof draft.confidence === "string" &&
+      typeof draft.explanation === "string" &&
+      typeof draft.alternative === "string" &&
+      typeof draft.savedAt === "string"
+    );
+  });
 }
 
 export function saveHypothesisDraft(draft: HypothesisDraft): void {

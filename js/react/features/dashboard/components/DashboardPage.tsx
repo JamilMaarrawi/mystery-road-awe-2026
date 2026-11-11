@@ -1,7 +1,6 @@
 import type { ViewName } from "../../../../core/constants";
 import type { CaseDataState } from "../useCaseData";
 import { computeReviewStats } from "../dashboardStats";
-import { readBookmarkCount } from "../bookmarks";
 import { IntroCard } from "./IntroCard";
 import { CaseSummaryCard } from "./CaseSummaryCard";
 import { StatCard } from "./StatCard";
@@ -11,13 +10,14 @@ import { RecentTimeline } from "./RecentTimeline";
 
 interface DashboardPageProps {
   data: CaseDataState;
+  bookmarks: readonly string[];
   onNavigate: (view: ViewName) => void;
 }
 
-export function DashboardPage({ data, onNavigate }: DashboardPageProps) {
+export function DashboardPage({ data, bookmarks, onNavigate }: DashboardPageProps) {
   // Derived values are recalculated on every render, so they cannot go stale.
   const { reviewedCount, progressPct } = computeReviewStats(data.evidence);
-  const bookmarkCount = readBookmarkCount();
+  const bookmarkCount = bookmarks.length;
 
   return (
     <section className="view active">

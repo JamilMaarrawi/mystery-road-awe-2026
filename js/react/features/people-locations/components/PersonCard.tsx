@@ -4,7 +4,7 @@ import { Card } from "../../../shared/components/Card";
 
 interface PersonCardProps {
   person: Person;
-  evidenceCount: number;
+  evidenceCount: number | null;
   onEvidenceClick?: (personId: string) => void;
 }
 
@@ -12,11 +12,7 @@ export function PersonCard({ person, evidenceCount, onEvidenceClick }: PersonCar
   return (
     <Card className="person-card">
       <div className="person-card-header">
-        <img
-          className="person-avatar"
-          src={person.avatar}
-          alt={`Portrait of ${person.name}`}
-        />
+        <img className="person-avatar" src={person.avatar} alt={`Portrait of ${person.name}`} />
         <div>
           <h3>
             <Link to={`/people/${person.id}`}>{person.name}</Link>
@@ -33,16 +29,26 @@ export function PersonCard({ person, evidenceCount, onEvidenceClick }: PersonCar
         ))}
       </ul>
       <div className="person-statement">&ldquo;{person.statement}&rdquo;</div>
-      <p>
-        {evidenceCount} related evidence item{evidenceCount === 1 ? "" : "s"} &mdash;{" "}
-        <button
-          type="button"
-          className="evidence-count-link"
-          onClick={() => onEvidenceClick?.(person.id)}
-        >
-          view
-        </button>
-      </p>
+      {evidenceCount !== null && (
+        <p>
+          {evidenceCount} related evidence item{evidenceCount === 1 ? "" : "s"}
+          {onEvidenceClick ? (
+            <>
+              {" "}
+              &mdash;{" "}
+              <button
+                type="button"
+                className="evidence-count-link"
+                onClick={() => onEvidenceClick(person.id)}
+              >
+                view
+              </button>
+            </>
+          ) : (
+            " (evidence view not yet available)"
+          )}
+        </p>
+      )}
     </Card>
   );
 }
